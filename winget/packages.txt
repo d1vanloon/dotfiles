@@ -1,6 +1,5 @@
 JanDeDobbeleer.OhMyPosh
 Git.Git
-Microsoft.WinGet.CommandNotFound
 GitHub.cli
 XP89DCGQ3K6VLD # PowerToys (Preview)
 Gyan.FFmpeg
