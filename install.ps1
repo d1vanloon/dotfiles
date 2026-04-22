@@ -183,6 +183,21 @@ function Get-RepoWingetScriptPath {
 	return $scriptPath
 }
 
+function Get-RepoVisualStudioScriptPath {
+	$scriptPath = Join-Path $PSScriptRoot 'visual-studio' 'visual-studio.ps1'
+	if (-not (Test-Path -Path $scriptPath -PathType Leaf)) {
+		throw "Expected file not found: $scriptPath"
+	}
+	return $scriptPath
+}
+
+function Install-VisualStudio {
+	[CmdletBinding(SupportsShouldProcess = $true)]
+	param([Parameter(Mandatory)] [string]$SourceVisualStudioScriptPath)
+
+	& $SourceVisualStudioScriptPath -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
+}
+
 function Get-PwshProfilePath {
 	if (-not $PROFILE -or -not $PROFILE.CurrentUserAllHosts) {
 		throw 'Unable to resolve $PROFILE.CurrentUserAllHosts for this host.'
@@ -324,8 +339,9 @@ $fontsRoot = Get-RepoFontsRoot
 $terminalSettings = Get-RepoTerminalSettingsPath
 $gitConfigPath = Get-RepoGitConfigPath -ProfileName $InstallProfile
 $wingetScript = Get-RepoWingetScriptPath
+$visualStudioScript = Get-RepoVisualStudioScriptPath
 
-foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsRoot, $terminalSettings, $gitConfigPath, $wingetScript)) {
+foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsRoot, $terminalSettings, $gitConfigPath, $wingetScript, $visualStudioScript)) {
 	if (-not (Test-Path -LiteralPath $p)) {
 		throw "Missing expected source path: $p"
 	}
@@ -345,5 +361,6 @@ Install-GitConfig -SourceGitConfigPath $gitConfigPath
 Install-Fonts -FontsSourceDir $fontsRoot
 Install-TerminalSettings -SourceSettingsPath $terminalSettings
 Install-WingetPackages -SourceWingetScriptPath $wingetScript -ProfileName $InstallProfile
+Install-VisualStudio -SourceVisualStudioScriptPath $visualStudioScript
 
 Write-Host 'Done.' -ForegroundColor Green

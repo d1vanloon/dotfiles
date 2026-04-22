@@ -5,7 +5,6 @@ Google.Chrome
 Microsoft.AzureCLI
 Microsoft.VisualStudio.2019.Professional
 Microsoft.Azure.StorageEmulator
-Microsoft.VisualStudio.Professional.Insiders
 Microsoft.DotNet.UninstallTool
 Microsoft.SQLServerManagementStudio
 Microsoft.NuGet
