@@ -45,6 +45,61 @@ function Get-RepoFontsRoot {
 	return $fontsRoot
 }
 
+function Get-RepoTerminalSettingsPath {
+	$settingsPath = Join-Path $PSScriptRoot 'terminal' 'setttings.json'
+	if (-not (Test-Path -Path $settingsPath -PathType Leaf)) {
+		throw "Expected file not found: $settingsPath"
+	}
+	return $settingsPath
+}
+
+function Merge-JsonObject {
+	param(
+		[Parameter(Mandatory)] [PSCustomObject]$Base,
+		[Parameter(Mandatory)] [PSCustomObject]$Override
+	)
+
+	$result = $Base | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+
+	foreach ($prop in $Override.PSObject.Properties) {
+		$existing = $result.PSObject.Properties[$prop.Name]
+		if ($existing -and ($prop.Value -is [PSCustomObject]) -and ($existing.Value -is [PSCustomObject])) {
+			$result.PSObject.Properties.Remove($prop.Name)
+			$result | Add-Member -NotePropertyName $prop.Name -NotePropertyValue (Merge-JsonObject -Base $existing.Value -Override $prop.Value)
+		}
+		else {
+			if ($existing) {
+				$result.PSObject.Properties.Remove($prop.Name)
+			}
+			$result | Add-Member -NotePropertyName $prop.Name -NotePropertyValue $prop.Value
+		}
+	}
+
+	return $result
+}
+
+function Install-TerminalSettings {
+	[CmdletBinding(SupportsShouldProcess = $true)]
+	param([Parameter(Mandatory)] [string]$SourceSettingsPath)
+
+	$terminalSettingsPath = Join-Path $env:LOCALAPPDATA 'Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json'
+
+	if (-not (Test-Path -LiteralPath $terminalSettingsPath)) {
+		Write-Warning "Windows Terminal settings not found at: $terminalSettingsPath"
+		return
+	}
+
+	$sourceSettings = Get-Content -LiteralPath $SourceSettingsPath -Raw | ConvertFrom-Json
+	$currentSettings = Get-Content -LiteralPath $terminalSettingsPath -Raw | ConvertFrom-Json
+
+	$merged = Merge-JsonObject -Base $currentSettings -Override $sourceSettings
+
+	if ($PSCmdlet.ShouldProcess($terminalSettingsPath, 'Merge terminal settings')) {
+		$merged | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $terminalSettingsPath -Encoding UTF8
+		Write-Host "Merged terminal settings into: $terminalSettingsPath" -ForegroundColor Green
+	}
+}
+
 function Install-Fonts {
 	[CmdletBinding(SupportsShouldProcess = $true)]
 	param([Parameter(Mandatory)] [string]$FontsSourceDir)
@@ -219,8 +274,9 @@ $sourceProfile = Join-Path $psRoot 'profile.ps1'
 $sourceProfileD = Join-Path $psRoot 'profile.d'
 $sourceTheme = Join-Path $psRoot 'theme.omp.json'
 $fontsRoot = Get-RepoFontsRoot
+$terminalSettings = Get-RepoTerminalSettingsPath
 
-foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsRoot)) {
+foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsRoot, $terminalSettings)) {
 	if (-not (Test-Path -LiteralPath $p)) {
 		throw "Missing expected source path: $p"
 	}
@@ -237,5 +293,6 @@ New-Link -LinkPath (Join-Path $profileDir 'theme.omp.json') -TargetPath $sourceT
 Write-Host "Installed pwsh profile links into: $profileDir" -ForegroundColor Green
 
 Install-Fonts -FontsSourceDir $fontsRoot
+Install-TerminalSettings -SourceSettingsPath $terminalSettings
 
 Write-Host 'Done.' -ForegroundColor Green

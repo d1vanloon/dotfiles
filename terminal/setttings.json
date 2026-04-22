@@ -1,0 +1,16 @@
+{
+    "$help": "https://aka.ms/terminal-documentation",
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "profiles": {
+        "defaults": {
+            "cursorShape": "filledBox",
+            "font": {
+                "face": "Delugia Nerd Font"
+            },
+            "opacity": 70,
+            "useAcrylic": true
+        }
+    },
+    "useAcrylicInTabRow": true,
+    "windowingBehavior": "useExisting"
+}
