@@ -183,6 +183,14 @@ function Get-RepoWingetScriptPath {
 	return $scriptPath
 }
 
+function Get-RepoEnvVarsScriptPath {
+	$scriptPath = Join-Path $PSScriptRoot 'environment-vars' 'environment-vars.ps1'
+	if (-not (Test-Path -Path $scriptPath -PathType Leaf)) {
+		throw "Expected file not found: $scriptPath"
+	}
+	return $scriptPath
+}
+
 function Get-RepoDotnetScriptPath {
 	$scriptPath = Join-Path $PSScriptRoot 'dotnet' 'dotnet.ps1'
 	if (-not (Test-Path -Path $scriptPath -PathType Leaf)) {
@@ -197,6 +205,16 @@ function Get-RepoVisualStudioScriptPath {
 		throw "Expected file not found: $scriptPath"
 	}
 	return $scriptPath
+}
+
+function Install-EnvironmentVars {
+	[CmdletBinding(SupportsShouldProcess = $true)]
+	param(
+		[Parameter(Mandatory)] [string]$SourceEnvVarsScriptPath,
+		[Parameter(Mandatory)] [string]$ProfileName
+	)
+
+	& $SourceEnvVarsScriptPath -InstallProfile $ProfileName -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
 }
 
 function Install-DotnetTools {
@@ -356,8 +374,9 @@ $gitConfigPath = Get-RepoGitConfigPath -ProfileName $InstallProfile
 $wingetScript = Get-RepoWingetScriptPath
 $visualStudioScript = Get-RepoVisualStudioScriptPath
 $dotnetScript = Get-RepoDotnetScriptPath
+$envVarsScript = Get-RepoEnvVarsScriptPath
 
-foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsRoot, $terminalSettings, $gitConfigPath, $wingetScript, $visualStudioScript, $dotnetScript)) {
+foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsRoot, $terminalSettings, $gitConfigPath, $wingetScript, $visualStudioScript, $dotnetScript, $envVarsScript)) {
 	if (-not (Test-Path -LiteralPath $p)) {
 		throw "Missing expected source path: $p"
 	}
@@ -379,5 +398,6 @@ Install-TerminalSettings -SourceSettingsPath $terminalSettings
 Install-WingetPackages -SourceWingetScriptPath $wingetScript -ProfileName $InstallProfile
 Install-DotnetTools -SourceDotnetScriptPath $dotnetScript
 Install-VisualStudio -SourceVisualStudioScriptPath $visualStudioScript
+Install-EnvironmentVars -SourceEnvVarsScriptPath $envVarsScript -ProfileName $InstallProfile
 
 Write-Host 'Done.' -ForegroundColor Green
