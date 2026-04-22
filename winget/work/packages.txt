@@ -1,0 +1,18 @@
+Cloudflare.Warp
+Microsoft.Azure.DataStudio
+ShiningLight.OpenSSL.Dev
+Google.Chrome
+Microsoft.AzureCLI
+Microsoft.VisualStudio.2019.Professional
+Microsoft.Azure.StorageEmulator
+Microsoft.VisualStudio.Professional.Insiders
+Microsoft.DotNet.UninstallTool
+Microsoft.SQLServerManagementStudio
+Microsoft.NuGet
+Wilfred.difftastic
+Microsoft.Azure.StorageExplorer
+JetBrains.dotPeek
+Anysphere.Cursor
+9WZDNCRDK3WP # Slack
+Anthropic.Claude
+Anthropic.ClaudeCode

@@ -107,6 +107,16 @@ function Install-GitConfig {
 	Write-Host "Installed .gitconfig link: $destPath -> $SourceGitConfigPath" -ForegroundColor Green
 }
 
+function Install-WingetPackages {
+	[CmdletBinding(SupportsShouldProcess = $true)]
+	param(
+		[Parameter(Mandatory)] [string]$SourceWingetScriptPath,
+		[Parameter(Mandatory)] [string]$ProfileName
+	)
+
+	& $SourceWingetScriptPath -InstallProfile $ProfileName -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
+}
+
 function Install-TerminalSettings {
 	[CmdletBinding(SupportsShouldProcess = $true)]
 	param([Parameter(Mandatory)] [string]$SourceSettingsPath)
@@ -163,6 +173,14 @@ function Install-Fonts {
 			Write-Host "Installed font: $($font.Name)" -ForegroundColor Green
 		}
 	}
+}
+
+function Get-RepoWingetScriptPath {
+	$scriptPath = Join-Path $PSScriptRoot 'winget' 'winget.ps1'
+	if (-not (Test-Path -Path $scriptPath -PathType Leaf)) {
+		throw "Expected file not found: $scriptPath"
+	}
+	return $scriptPath
 }
 
 function Get-PwshProfilePath {
@@ -305,8 +323,9 @@ $sourceTheme = Join-Path $psRoot 'theme.omp.json'
 $fontsRoot = Get-RepoFontsRoot
 $terminalSettings = Get-RepoTerminalSettingsPath
 $gitConfigPath = Get-RepoGitConfigPath -ProfileName $InstallProfile
+$wingetScript = Get-RepoWingetScriptPath
 
-foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsRoot, $terminalSettings, $gitConfigPath)) {
+foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsRoot, $terminalSettings, $gitConfigPath, $wingetScript)) {
 	if (-not (Test-Path -LiteralPath $p)) {
 		throw "Missing expected source path: $p"
 	}
@@ -325,5 +344,6 @@ Write-Host "Installed pwsh profile links into: $profileDir" -ForegroundColor Gre
 Install-GitConfig -SourceGitConfigPath $gitConfigPath
 Install-Fonts -FontsSourceDir $fontsRoot
 Install-TerminalSettings -SourceSettingsPath $terminalSettings
+Install-WingetPackages -SourceWingetScriptPath $wingetScript -ProfileName $InstallProfile
 
 Write-Host 'Done.' -ForegroundColor Green

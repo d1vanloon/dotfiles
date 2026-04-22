@@ -1,0 +1,15 @@
+JanDeDobbeleer.OhMyPosh
+Git.Git
+Microsoft.WinGet.CommandNotFound
+GitHub.cli
+XP89DCGQ3K6VLD # PowerToys (Preview)
+Gyan.FFmpeg
+astral-sh.uv
+jqlang.jq
+junegunn.fzf
+sharkdp.bat
+Microsoft.VisualStudioCode.Insiders
+AgileBits.1Password
+9P7KNL5RWT25 # Sysinternals
+Microsoft.WindowsTerminal
+GitHub.Copilot
