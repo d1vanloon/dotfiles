@@ -191,6 +191,14 @@ function Get-RepoEnvVarsScriptPath {
 	return $scriptPath
 }
 
+function Get-RepoPowerShellScriptPath {
+	$scriptPath = Join-Path $PSScriptRoot 'powershell' 'powershell.ps1'
+	if (-not (Test-Path -Path $scriptPath -PathType Leaf)) {
+		throw "Expected file not found: $scriptPath"
+	}
+	return $scriptPath
+}
+
 function Get-RepoDotnetScriptPath {
 	$scriptPath = Join-Path $PSScriptRoot 'dotnet' 'dotnet.ps1'
 	if (-not (Test-Path -Path $scriptPath -PathType Leaf)) {
@@ -215,6 +223,13 @@ function Install-EnvironmentVars {
 	)
 
 	& $SourceEnvVarsScriptPath -InstallProfile $ProfileName -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
+}
+
+function Install-PowerShellModules {
+	[CmdletBinding(SupportsShouldProcess = $true)]
+	param([Parameter(Mandatory)] [string]$SourcePowerShellScriptPath)
+
+	& $SourcePowerShellScriptPath -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
 }
 
 function Install-DotnetTools {
@@ -375,8 +390,9 @@ $wingetScript = Get-RepoWingetScriptPath
 $visualStudioScript = Get-RepoVisualStudioScriptPath
 $dotnetScript = Get-RepoDotnetScriptPath
 $envVarsScript = Get-RepoEnvVarsScriptPath
+$psModulesScript = Get-RepoPowerShellScriptPath
 
-foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsRoot, $terminalSettings, $gitConfigPath, $wingetScript, $visualStudioScript, $dotnetScript, $envVarsScript)) {
+foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsRoot, $terminalSettings, $gitConfigPath, $wingetScript, $visualStudioScript, $dotnetScript, $envVarsScript, $psModulesScript)) {
 	if (-not (Test-Path -LiteralPath $p)) {
 		throw "Missing expected source path: $p"
 	}
@@ -392,6 +408,7 @@ New-Link -LinkPath (Join-Path $profileDir 'theme.omp.json') -TargetPath $sourceT
 
 Write-Host "Installed pwsh profile links into: $profileDir" -ForegroundColor Green
 
+Install-PowerShellModules -SourcePowerShellScriptPath $psModulesScript
 Install-GitConfig -SourceGitConfigPath $gitConfigPath
 Install-Fonts -FontsSourceDir $fontsRoot
 Install-TerminalSettings -SourceSettingsPath $terminalSettings
