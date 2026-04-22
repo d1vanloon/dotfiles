@@ -1,10 +1,11 @@
 <#
 .SYNOPSIS
-Installs this repo's PowerShell profile by linking files into the host profile location.
+Installs this repo's PowerShell profile and fonts.
 
 .DESCRIPTION
 Creates links in the directory that contains $PROFILE so that PowerShell loads the repo's
-profile parts (profile.d) and Oh My Posh theme.
+profile parts (profile.d) and Oh My Posh theme. Also installs fonts from the fonts/
+directory into the current user's font directory.
 
 Default behavior installs for the current host profile path ($PROFILE).
 
@@ -34,6 +35,40 @@ function Get-RepoPowerShellRoot {
 		throw "Expected folder not found: $psRoot"
 	}
 	return $psRoot
+}
+
+function Get-RepoFontsRoot {
+	$fontsRoot = Join-Path $PSScriptRoot 'fonts'
+	if (-not (Test-Path -Path $fontsRoot -PathType Container)) {
+		throw "Expected folder not found: $fontsRoot"
+	}
+	return $fontsRoot
+}
+
+function Install-Fonts {
+	[CmdletBinding(SupportsShouldProcess = $true)]
+	param([Parameter(Mandatory)] [string]$FontsSourceDir)
+
+	$userFontsDir = Join-Path $env:LOCALAPPDATA 'Microsoft\Windows\Fonts'
+	Ensure-Directory -Path $userFontsDir
+
+	$fontFiles = Get-ChildItem -Path $FontsSourceDir -File | Where-Object { $_.Extension -in '.ttf', '.otf' }
+
+	if (-not $fontFiles) {
+		Write-Warning "No font files found in: $FontsSourceDir"
+		return
+	}
+
+	foreach ($font in $fontFiles) {
+		$destPath = Join-Path $userFontsDir $font.Name
+		if ($PSCmdlet.ShouldProcess($font.Name, "Install font to $userFontsDir")) {
+			Copy-Item -LiteralPath $font.FullName -Destination $destPath -Force
+			$fontRegName = [System.IO.Path]::GetFileNameWithoutExtension($font.Name) + ' (TrueType)'
+			$regPath = 'HKCU:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts'
+			Set-ItemProperty -Path $regPath -Name $fontRegName -Value $destPath -Force
+			Write-Host "Installed font: $($font.Name)" -ForegroundColor Green
+		}
+	}
 }
 
 function Get-PwshProfilePath {
@@ -173,8 +208,9 @@ $psRoot = Get-RepoPowerShellRoot
 $sourceProfile = Join-Path $psRoot 'profile.ps1'
 $sourceProfileD = Join-Path $psRoot 'profile.d'
 $sourceTheme = Join-Path $psRoot 'theme.omp.json'
+$fontsRoot = Get-RepoFontsRoot
 
-foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme)) {
+foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsRoot)) {
 	if (-not (Test-Path -LiteralPath $p)) {
 		throw "Missing expected source path: $p"
 	}
@@ -189,5 +225,7 @@ New-Link -LinkPath (Join-Path $profileDir 'profile.d') -TargetPath $sourceProfil
 New-Link -LinkPath (Join-Path $profileDir 'theme.omp.json') -TargetPath $sourceTheme -Type File -Force:$Force
 
 Write-Host "Installed pwsh profile links into: $profileDir" -ForegroundColor Green
+
+Install-Fonts -FontsSourceDir $fontsRoot
 
 Write-Host 'Done.' -ForegroundColor Green
