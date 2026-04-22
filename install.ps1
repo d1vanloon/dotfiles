@@ -187,7 +187,14 @@ function Install-VisualStudio {
 
 function Install-Ssms {
 	[CmdletBinding(SupportsShouldProcess = $true)]
-	param([Parameter(Mandatory)] [string]$SourceSsmsScriptPath)
+	param(
+		[Parameter(Mandatory)] [string]$SourceSsmsScriptPath,
+		[Parameter(Mandatory)] [string]$ProfileName
+	)
+
+	if ($ProfileName -ne 'Work') {
+		return
+	}
 
 	& $SourceSsmsScriptPath -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
 }
@@ -362,7 +369,7 @@ Install-Terminal -SourceTerminalScriptPath $terminalScript
 Install-WingetPackages -SourceWingetScriptPath $wingetScript -ProfileName $InstallProfile
 Install-DotnetTools -SourceDotnetScriptPath $dotnetScript
 Install-VisualStudio -SourceVisualStudioScriptPath $visualStudioScript
-Install-Ssms -SourceSsmsScriptPath $ssmsScript
+Install-Ssms -SourceSsmsScriptPath $ssmsScript -ProfileName $InstallProfile
 Install-EnvironmentVars -SourceEnvVarsScriptPath $envVarsScript -ProfileName $InstallProfile
 
 Write-Host 'Done.' -ForegroundColor Green
