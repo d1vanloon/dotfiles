@@ -1,12 +1,3 @@
-# Setup:
-# > Install-Module PANSIES -AllowClobber
-# > Install-Module PowerLine
-# > Install-Module posh-git
-# > winget install JanDeDobbeleer.OhMyPosh -s winget
-# > Install-Module Get-ChildItemColor
-# > Install-Module z -AllowClobber
-# > Install-Module -Name PSFzf
-
 $profileParts = @(
     'profile.d/00-modules.ps1',
     'profile.d/10-git.ps1',
