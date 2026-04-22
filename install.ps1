@@ -59,12 +59,22 @@ function Install-Fonts {
 		return
 	}
 
+	$regPath = 'HKCU:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts'
+
 	foreach ($font in $fontFiles) {
 		$destPath = Join-Path $userFontsDir $font.Name
+		$fontRegName = [System.IO.Path]::GetFileNameWithoutExtension($font.Name) + ' (TrueType)'
+
+		$fileExists = Test-Path -LiteralPath $destPath
+		$regExists = $null -ne (Get-ItemProperty -Path $regPath -Name $fontRegName -ErrorAction SilentlyContinue)
+
+		if ($fileExists -and $regExists) {
+			Write-Verbose "Font already installed, skipping: $($font.Name)"
+			continue
+		}
+
 		if ($PSCmdlet.ShouldProcess($font.Name, "Install font to $userFontsDir")) {
 			Copy-Item -LiteralPath $font.FullName -Destination $destPath -Force
-			$fontRegName = [System.IO.Path]::GetFileNameWithoutExtension($font.Name) + ' (TrueType)'
-			$regPath = 'HKCU:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts'
 			Set-ItemProperty -Path $regPath -Name $fontRegName -Value $destPath -Force
 			Write-Host "Installed font: $($font.Name)" -ForegroundColor Green
 		}
