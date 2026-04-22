@@ -5,7 +5,8 @@ Installs this repo's PowerShell profile and fonts.
 .DESCRIPTION
 Creates links in the directory that contains $PROFILE so that PowerShell loads the repo's
 profile parts (profile.d) and Oh My Posh theme. Also installs fonts from the fonts/
-directory into the current user's font directory.
+directory into the current user's font directory, merges terminal settings, and symlinks
+the appropriate git config based on the selected profile.
 
 Default behavior installs for the current host profile path ($PROFILE).
 
@@ -15,8 +16,15 @@ to junctions and files fall back to copies (with a warning).
 .PARAMETER Force
 Replace existing items at the destination.
 
+.PARAMETER InstallProfile
+The profile to install. Valid values are 'Personal' (default) and 'Work'.
+Determines which git config is symlinked to ~/.gitconfig.
+
 .EXAMPLE
 ./install.ps1
+
+.EXAMPLE
+./install.ps1 -InstallProfile Work
 
 .EXAMPLE
 ./install.ps1 -Force
@@ -24,7 +32,9 @@ Replace existing items at the destination.
 
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
-	[switch]$Force
+	[switch]$Force,
+	[ValidateSet('Personal', 'Work')]
+	[string]$InstallProfile = 'Personal'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -43,6 +53,16 @@ function Get-RepoFontsRoot {
 		throw "Expected folder not found: $fontsRoot"
 	}
 	return $fontsRoot
+}
+
+function Get-RepoGitConfigPath {
+	param([Parameter(Mandatory)] [string]$ProfileName)
+
+	$gitConfigPath = Join-Path $PSScriptRoot 'git' $ProfileName.ToLower() '.gitconfig'
+	if (-not (Test-Path -Path $gitConfigPath -PathType Leaf)) {
+		throw "Expected file not found: $gitConfigPath"
+	}
+	return $gitConfigPath
 }
 
 function Get-RepoTerminalSettingsPath {
@@ -76,6 +96,15 @@ function Merge-JsonObject {
 	}
 
 	return $result
+}
+
+function Install-GitConfig {
+	[CmdletBinding(SupportsShouldProcess = $true)]
+	param([Parameter(Mandatory)] [string]$SourceGitConfigPath)
+
+	$destPath = Join-Path $env:USERPROFILE '.gitconfig'
+	New-Link -LinkPath $destPath -TargetPath $SourceGitConfigPath -Type File -Force:$Force
+	Write-Host "Installed .gitconfig link: $destPath -> $SourceGitConfigPath" -ForegroundColor Green
 }
 
 function Install-TerminalSettings {
@@ -275,8 +304,9 @@ $sourceProfileD = Join-Path $psRoot 'profile.d'
 $sourceTheme = Join-Path $psRoot 'theme.omp.json'
 $fontsRoot = Get-RepoFontsRoot
 $terminalSettings = Get-RepoTerminalSettingsPath
+$gitConfigPath = Get-RepoGitConfigPath -ProfileName $InstallProfile
 
-foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsRoot, $terminalSettings)) {
+foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsRoot, $terminalSettings, $gitConfigPath)) {
 	if (-not (Test-Path -LiteralPath $p)) {
 		throw "Missing expected source path: $p"
 	}
@@ -292,6 +322,7 @@ New-Link -LinkPath (Join-Path $profileDir 'theme.omp.json') -TargetPath $sourceT
 
 Write-Host "Installed pwsh profile links into: $profileDir" -ForegroundColor Green
 
+Install-GitConfig -SourceGitConfigPath $gitConfigPath
 Install-Fonts -FontsSourceDir $fontsRoot
 Install-TerminalSettings -SourceSettingsPath $terminalSettings
 

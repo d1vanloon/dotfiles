@@ -1,0 +1,70 @@
+# This is Git's per-user configuration file.
+[user]
+    name = David Van Loon
+    email = david@vanloon.family
+    signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMot0AYYB2uCLnEz6EhHP0hgqDnDZamJ7nrMZxdnomgz
+[core]
+    editor = code-insiders --wait
+	longpaths = true
+[diff]
+	external = difft
+[difftool "default-difftool"]
+	cmd = code-insiders --wait --diff $LOCAL $REMOTE
+[gpg]
+    format = ssh
+[gpg "ssh"]
+	program = C:\\Users\\david\\AppData\\Local\\Microsoft\\WindowsApps\\op-ssh-sign.exe
+[commit]
+    gpgsign = true
+[alias]
+	s = status
+	d = diff
+	co = checkout
+	br = branch
+	# Create new branch and check it out
+	nb = checkout -b
+	last = log -1 HEAD
+	cane = commit --amend --no-edit
+	pr = pull --rebase
+	lo = log --oneline -n 10
+	pop = reset HEAD~
+	unpop = reset 'HEAD@{1}'
+	patch = format-patch -1 HEAD
+
+	# Difftastic aliases, so `git dlog -p` is `git log -p`
+	# with difftastic and likewise for the other subcommands.
+	dlog = -c diff.external=difft log --ext-diff
+	dshow = -c diff.external=difft show --ext-diff
+	ddiff = -c diff.external=difft diff
+
+    # `git log` with patches shown with difftastic.
+    dl = -c diff.external=difft log -p --ext-diff
+
+    # Show the most recent commit with difftastic.
+    ds = -c diff.external=difft show --ext-diff
+
+    # `git diff` with difftastic.
+    dft = -c diff.external=difft diff
+[help]
+	autocorrect = 20
+[push]
+	autoSetupRemote = true
+	default = upstream
+[pull]
+	ff = only
+[branch]
+	autosetupmerge = simple
+[rebase]
+	autoStash = true
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[init]
+	defaultBranch = master
+[fetch]
+	prune = true
+[safe]
+	directory = %(prefix)///scarif/appdata/caddy
+	directory = *
