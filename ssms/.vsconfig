@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "components": [
+    "Component.VisualStudio.GitHub.Copilot",
+    "Microsoft.SqlServer.Workload.SSMS.AI",
+    "Microsoft.SSMS.Component.Core",
+    "Microsoft.VisualStudio.Component.CoreEditor",
+    "Microsoft.VisualStudio.Component.IntelliCode",
+    "Microsoft.VisualStudio.Component.Roslyn.Compiler",
+    "Microsoft.VisualStudio.Component.Roslyn.LanguageServices",
+    "Microsoft.VisualStudio.Workload.SSMSCore"
+  ],
+  "extensions": []
+}

@@ -146,6 +146,14 @@ function Get-RepoVisualStudioScriptPath {
 	return $scriptPath
 }
 
+function Get-RepoSsmsScriptPath {
+	$scriptPath = Join-Path $PSScriptRoot 'ssms' 'ssms.ps1'
+	if (-not (Test-Path -Path $scriptPath -PathType Leaf)) {
+		throw "Expected file not found: $scriptPath"
+	}
+	return $scriptPath
+}
+
 function Install-EnvironmentVars {
 	[CmdletBinding(SupportsShouldProcess = $true)]
 	param(
@@ -175,6 +183,13 @@ function Install-VisualStudio {
 	param([Parameter(Mandatory)] [string]$SourceVisualStudioScriptPath)
 
 	& $SourceVisualStudioScriptPath -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
+}
+
+function Install-Ssms {
+	[CmdletBinding(SupportsShouldProcess = $true)]
+	param([Parameter(Mandatory)] [string]$SourceSsmsScriptPath)
+
+	& $SourceSsmsScriptPath -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
 }
 
 function Get-PwshProfilePath {
@@ -319,11 +334,12 @@ $terminalScript = Get-RepoTerminalScriptPath
 $gitConfigPath = Get-RepoGitConfigPath -ProfileName $InstallProfile
 $wingetScript = Get-RepoWingetScriptPath
 $visualStudioScript = Get-RepoVisualStudioScriptPath
+$ssmsScript = Get-RepoSsmsScriptPath
 $dotnetScript = Get-RepoDotnetScriptPath
 $envVarsScript = Get-RepoEnvVarsScriptPath
 $psModulesScript = Get-RepoPowerShellScriptPath
 
-foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsScript, $terminalScript, $gitConfigPath, $wingetScript, $visualStudioScript, $dotnetScript, $envVarsScript, $psModulesScript)) {
+foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsScript, $terminalScript, $gitConfigPath, $wingetScript, $visualStudioScript, $ssmsScript, $dotnetScript, $envVarsScript, $psModulesScript)) {
 	if (-not (Test-Path -LiteralPath $p)) {
 		throw "Missing expected source path: $p"
 	}
@@ -346,6 +362,7 @@ Install-Terminal -SourceTerminalScriptPath $terminalScript
 Install-WingetPackages -SourceWingetScriptPath $wingetScript -ProfileName $InstallProfile
 Install-DotnetTools -SourceDotnetScriptPath $dotnetScript
 Install-VisualStudio -SourceVisualStudioScriptPath $visualStudioScript
+Install-Ssms -SourceSsmsScriptPath $ssmsScript
 Install-EnvironmentVars -SourceEnvVarsScriptPath $envVarsScript -ProfileName $InstallProfile
 
 Write-Host 'Done.' -ForegroundColor Green

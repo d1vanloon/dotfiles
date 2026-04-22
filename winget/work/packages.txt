@@ -6,7 +6,6 @@ Microsoft.AzureCLI
 Microsoft.VisualStudio.2019.Professional
 Microsoft.Azure.StorageEmulator
 Microsoft.DotNet.UninstallTool
-Microsoft.SQLServerManagementStudio
 Microsoft.NuGet
 Wilfred.difftastic
 Microsoft.Azure.StorageExplorer
