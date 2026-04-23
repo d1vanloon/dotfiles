@@ -13,7 +13,7 @@
 [gpg]
   format = ssh
 [gpg "ssh"]
-  program = "C:/Users/david.vanloon/AppData/Local/Microsoft/WindowsApps/op-ssh-sign.exe"
+	program = C:\\Program Files\\1Password\\app\\8\\op-ssh-sign.exe
 [commit]
 	gpgsign = true
 [alias]
