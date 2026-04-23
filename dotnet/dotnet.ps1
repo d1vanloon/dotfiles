@@ -1,20 +1,30 @@
 <#
 .SYNOPSIS
-Installs .NET global tools listed in tools.txt.
+Installs .NET global tools based on the installation profile.
 
 .DESCRIPTION
-Reads tool IDs from tools.txt in the same directory and installs each using
-'dotnet tool install --global'. Lines may include inline comments after a #
-character, which are stripped. Empty and comment-only lines are ignored.
+Reads tool IDs from the common tools.txt and the profile-specific tools.txt,
+then installs each using 'dotnet tool install --global'. Lines may include
+inline comments after a # character, which are stripped. Empty and
+comment-only lines are ignored.
 
 Already-installed tools are updated instead of re-installed.
 
+.PARAMETER InstallProfile
+The profile to install. Valid values are 'Personal' (default) and 'Work'.
+
 .EXAMPLE
 ./dotnet.ps1
+
+.EXAMPLE
+./dotnet.ps1 -InstallProfile Work
 #>
 
 [CmdletBinding(SupportsShouldProcess = $true)]
-param()
+param(
+	[ValidateSet('Personal', 'Work')]
+	[string]$InstallProfile = 'Personal'
+)
 
 $ErrorActionPreference = 'Stop'
 
@@ -30,8 +40,10 @@ function Get-ToolIds {
 		Where-Object { $_ -ne '' }
 }
 
-$toolsPath = Join-Path $PSScriptRoot 'tools.txt'
-$toolIds = @(Get-ToolIds -Path $toolsPath)
+$commonToolsPath = Join-Path $PSScriptRoot 'tools.txt'
+$profileToolsPath = Join-Path $PSScriptRoot $InstallProfile.ToLower() 'tools.txt'
+
+$toolIds = @(Get-ToolIds -Path $commonToolsPath) + @(Get-ToolIds -Path $profileToolsPath)
 
 if (-not $toolIds) {
 	Write-Warning 'No .NET tools found to install.'
@@ -57,3 +69,5 @@ foreach ($id in $toolIds) {
 		}
 	}
 }
+
+Write-Host ".NET tools installed for profile: $InstallProfile" -ForegroundColor Green

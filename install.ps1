@@ -173,9 +173,12 @@ function Install-PowerShellModules {
 
 function Install-DotnetTools {
 	[CmdletBinding(SupportsShouldProcess = $true)]
-	param([Parameter(Mandatory)] [string]$SourceDotnetScriptPath)
+	param(
+		[Parameter(Mandatory)] [string]$SourceDotnetScriptPath,
+		[Parameter(Mandatory)] [string]$ProfileName
+	)
 
-	& $SourceDotnetScriptPath -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
+	& $SourceDotnetScriptPath -InstallProfile $ProfileName -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
 }
 
 function Install-VisualStudio {
@@ -367,7 +370,7 @@ Install-GitConfig -SourceGitConfigPath $gitConfigPath
 Install-Fonts -SourceFontsScriptPath $fontsScript
 Install-Terminal -SourceTerminalScriptPath $terminalScript
 Install-WingetPackages -SourceWingetScriptPath $wingetScript -ProfileName $InstallProfile
-Install-DotnetTools -SourceDotnetScriptPath $dotnetScript
+Install-DotnetTools -SourceDotnetScriptPath $dotnetScript -ProfileName $InstallProfile
 Install-VisualStudio -SourceVisualStudioScriptPath $visualStudioScript
 Install-Ssms -SourceSsmsScriptPath $ssmsScript -ProfileName $InstallProfile
 Install-EnvironmentVars -SourceEnvVarsScriptPath $envVarsScript -ProfileName $InstallProfile
