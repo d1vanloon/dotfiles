@@ -5,15 +5,27 @@ Installs SQL Server Management Studio using WinGet with the repo's .vsconfig.
 .DESCRIPTION
 Runs winget install for Microsoft.SQLServerManagementStudio.22, passing the .vsconfig
 file in the same directory as this script to configure installed workloads and components.
+Only the Work profile performs the installation.
+
+.PARAMETER InstallProfile
+The profile to install. Valid values are 'Personal' (default) and 'Work'.
 
 .EXAMPLE
 ./ssms.ps1
 #>
 
 [CmdletBinding(SupportsShouldProcess = $true)]
-param()
+param(
+	[ValidateSet('Personal', 'Work')]
+	[string]$InstallProfile = 'Personal'
+)
 
 $ErrorActionPreference = 'Stop'
+
+if ($InstallProfile -ne 'Work') {
+	Write-Verbose "Skipping SSMS install for profile: $InstallProfile"
+	return
+}
 
 $vsConfigPath = Join-Path $PSScriptRoot '.vsconfig'
 

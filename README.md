@@ -37,7 +37,7 @@ The selected profile controls which Git config, WinGet package list, .NET tool l
 ## Repository layout
 
 - `powershell/` - profile entrypoint, profile fragments, theme, and PowerShell module install script
-- `git/` - profile-specific `.gitconfig` files
+- `git/` - profile-specific `.gitconfig` files and Git config installer
 - `fonts/` - bundled fonts and installer
 - `terminal/` - Windows Terminal settings merge script
 - `winget/` - common and profile-specific WinGet package lists

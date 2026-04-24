@@ -55,14 +55,12 @@ function Get-RepoFontsScriptPath {
 	return $scriptPath
 }
 
-function Get-RepoGitConfigPath {
-	param([Parameter(Mandatory)] [string]$ProfileName)
-
-	$gitConfigPath = Join-Path $PSScriptRoot 'git' $ProfileName.ToLower() '.gitconfig'
-	if (-not (Test-Path -Path $gitConfigPath -PathType Leaf)) {
-		throw "Expected file not found: $gitConfigPath"
+function Get-RepoGitScriptPath {
+	$scriptPath = Join-Path $PSScriptRoot 'git' 'git.ps1'
+	if (-not (Test-Path -Path $scriptPath -PathType Leaf)) {
+		throw "Expected file not found: $scriptPath"
 	}
-	return $gitConfigPath
+	return $scriptPath
 }
 
 function Get-RepoTerminalScriptPath {
@@ -89,11 +87,12 @@ function Install-Terminal {
 
 function Install-GitConfig {
 	[CmdletBinding(SupportsShouldProcess = $true)]
-	param([Parameter(Mandatory)] [string]$SourceGitConfigPath)
+	param(
+		[Parameter(Mandatory)] [string]$SourceGitScriptPath,
+		[Parameter(Mandatory)] [string]$ProfileName
+	)
 
-	$destPath = Join-Path $env:USERPROFILE '.gitconfig'
-	New-Link -LinkPath $destPath -TargetPath $SourceGitConfigPath -Type File -Force:$Force
-	Write-Host "Installed .gitconfig link: $destPath -> $SourceGitConfigPath" -ForegroundColor Green
+	& $SourceGitScriptPath -InstallProfile $ProfileName -Force:$Force -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
 }
 
 function Install-WingetPackages {
@@ -195,11 +194,7 @@ function Install-Ssms {
 		[Parameter(Mandatory)] [string]$ProfileName
 	)
 
-	if ($ProfileName -ne 'Work') {
-		return
-	}
-
-	& $SourceSsmsScriptPath -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
+	& $SourceSsmsScriptPath -InstallProfile $ProfileName -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
 }
 
 function Get-PwshProfilePath {
@@ -341,7 +336,7 @@ $sourceProfileD = Join-Path $psRoot 'profile.d'
 $sourceTheme = Join-Path $psRoot 'theme.omp.json'
 $fontsScript = Get-RepoFontsScriptPath
 $terminalScript = Get-RepoTerminalScriptPath
-$gitConfigPath = Get-RepoGitConfigPath -ProfileName $InstallProfile
+$gitScript = Get-RepoGitScriptPath
 $wingetScript = Get-RepoWingetScriptPath
 $visualStudioScript = Get-RepoVisualStudioScriptPath
 $ssmsScript = Get-RepoSsmsScriptPath
@@ -349,7 +344,7 @@ $dotnetScript = Get-RepoDotnetScriptPath
 $envVarsScript = Get-RepoEnvVarsScriptPath
 $psModulesScript = Get-RepoPowerShellScriptPath
 
-foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsScript, $terminalScript, $gitConfigPath, $wingetScript, $visualStudioScript, $ssmsScript, $dotnetScript, $envVarsScript, $psModulesScript)) {
+foreach ($p in @($sourceProfile, $sourceProfileD, $sourceTheme, $fontsScript, $terminalScript, $gitScript, $wingetScript, $visualStudioScript, $ssmsScript, $dotnetScript, $envVarsScript, $psModulesScript)) {
 	if (-not (Test-Path -LiteralPath $p)) {
 		throw "Missing expected source path: $p"
 	}
@@ -366,7 +361,7 @@ New-Link -LinkPath (Join-Path $profileDir 'theme.omp.json') -TargetPath $sourceT
 Write-Host "Installed pwsh profile links into: $profileDir" -ForegroundColor Green
 
 Install-PowerShellModules -SourcePowerShellScriptPath $psModulesScript
-Install-GitConfig -SourceGitConfigPath $gitConfigPath
+Install-GitConfig -SourceGitScriptPath $gitScript -ProfileName $InstallProfile
 Install-Fonts -SourceFontsScriptPath $fontsScript
 Install-Terminal -SourceTerminalScriptPath $terminalScript
 Install-WingetPackages -SourceWingetScriptPath $wingetScript -ProfileName $InstallProfile
