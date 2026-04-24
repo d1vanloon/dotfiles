@@ -29,7 +29,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$helperScriptPath = Join-Path (Join-Path (Split-Path -Parent $PSScriptRoot) 'helpers') 'links.ps1'
+$helperScriptPath = Join-Path (Split-Path -Parent $PSScriptRoot) 'helpers/links.ps1'
 if (-not (Test-Path -LiteralPath $helperScriptPath -PathType Leaf)) {
 	throw "Expected helper script not found: $helperScriptPath"
 }
@@ -39,7 +39,7 @@ if (-not (Test-Path -LiteralPath $helperScriptPath -PathType Leaf)) {
 function Get-RepoGitConfigPath {
 	param([Parameter(Mandatory)] [string]$ProfileName)
 
-	$gitConfigPath = Join-Path $PSScriptRoot ($ProfileName.ToLower()) '.gitconfig'
+	$gitConfigPath = Join-Path (Join-Path $PSScriptRoot ($ProfileName.ToLower())) '.gitconfig'
 	if (-not (Test-Path -LiteralPath $gitConfigPath -PathType Leaf)) {
 		throw "Expected file not found: $gitConfigPath"
 	}
