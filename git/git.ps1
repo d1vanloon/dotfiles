@@ -40,6 +40,22 @@ function Get-RepoGitConfigPath {
 	return $gitConfigPath
 }
 
+function Get-UserHomePath {
+	$candidates = @(
+		[System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::UserProfile),
+		$env:USERPROFILE,
+		$HOME
+	) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+
+	foreach ($path in $candidates) {
+		if (Test-Path -LiteralPath $path -PathType Container) {
+			return $path
+		}
+	}
+
+	throw 'Unable to resolve the current user home directory.'
+}
+
 function Test-LinkMatchesTarget {
 	param(
 		[Parameter(Mandatory)] [string]$LinkPath,
@@ -138,7 +154,7 @@ function New-Link {
 }
 
 $sourceGitConfigPath = Get-RepoGitConfigPath -ProfileName $InstallProfile
-$destPath = Join-Path $env:USERPROFILE '.gitconfig'
+$destPath = Join-Path (Get-UserHomePath) '.gitconfig'
 
 New-Link -LinkPath $destPath -TargetPath $sourceGitConfigPath -Type File -Force:$Force
 Write-Host "Installed .gitconfig link: $destPath -> $sourceGitConfigPath" -ForegroundColor Green
