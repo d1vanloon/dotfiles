@@ -12,3 +12,4 @@ AgileBits.1Password
 9P7KNL5RWT25 # Sysinternals
 Microsoft.WindowsTerminal
 GitHub.Copilot
+max-sixty.worktrunk
