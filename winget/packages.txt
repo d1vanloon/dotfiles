@@ -13,3 +13,4 @@ AgileBits.1Password
 Microsoft.WindowsTerminal
 GitHub.Copilot
 max-sixty.worktrunk
+can1357.oh-my-pi
