@@ -7,6 +7,14 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "buffer_line_height": "comfortable",
+  "buffer_font_weight": 400.0,
+  "diff_view_style": "split",
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false,
+    "anthropic_retention": false
+  },
   "agent": {
     "favorite_models": [],
     "single_file_review": true,
@@ -19,6 +27,7 @@
   "agent_servers": {
     "oh-my-pi": {
       "default_config_options": {
+        "mode": "plan",
         "model": "openrouter/deepseek/deepseek-v4-flash:free"
       },
       "type": "custom",
@@ -55,8 +64,7 @@
   },
   "buffer_font_fallbacks": [
     "Consolas",
-    "Courier New",
-    "monospace"
+    "Courier New"
   ],
   "buffer_font_family": "Cascadia Code",
   "file_types": {
@@ -77,10 +85,15 @@
   ],
   "base_keymap": "VSCode",
   "ui_font_size": 16,
-  "buffer_font_size": 15,
+  "buffer_font_size": 14.0,
   "theme": {
     "mode": "system",
     "light": "One Light",
     "dark": "One Dark",
   },
+  "languages": {
+    "CSharp": {
+      "language_servers": ["roslyn", "csharp-ls", "omnisharp"]
+    }
+  }
 }
