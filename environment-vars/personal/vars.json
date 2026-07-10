@@ -1,4 +1,6 @@
 {
-  "variables": {},
+  "variables": {
+    "OMP_PROFILE": "personal"
+  },
   "path": []
 }

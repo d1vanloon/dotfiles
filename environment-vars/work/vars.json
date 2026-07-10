@@ -1,5 +1,6 @@
 {
   "variables": {
+    "OMP_PROFILE": "work"
   },
   "path": [
     "C:\\Users\\david.vanloon\\.local\\bin"
