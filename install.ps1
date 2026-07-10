@@ -162,6 +162,14 @@ function Get-RepoSsmsScriptPath {
 	return $scriptPath
 }
 
+function Get-RepoZedScriptPath {
+	$scriptPath = Join-Path $PSScriptRoot 'zed' 'zed.ps1'
+	if (-not (Test-Path -Path $scriptPath -PathType Leaf)) {
+		throw "Expected file not found: $scriptPath"
+	}
+	return $scriptPath
+}
+
 function Install-EnvironmentVars {
 	[CmdletBinding(SupportsShouldProcess = $true)]
 	param(
@@ -205,6 +213,13 @@ function Install-Ssms {
 
 	& $SourceSsmsScriptPath -InstallProfile $ProfileName -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
 }
+
+function Install-ZedSettings {
+	[CmdletBinding(SupportsShouldProcess = $true)]
+	param([Parameter(Mandatory)] [string]$SourceZedScriptPath)
+
+	& $SourceZedScriptPath -Force:$Force -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
+}
 $powerShellProfileScript = Get-RepoPowerShellProfileScriptPath
 $fontsScript = Get-RepoFontsScriptPath
 $terminalScript = Get-RepoTerminalScriptPath
@@ -212,11 +227,12 @@ $gitScript = Get-RepoGitScriptPath
 $wingetScript = Get-RepoWingetScriptPath
 $visualStudioScript = Get-RepoVisualStudioScriptPath
 $ssmsScript = Get-RepoSsmsScriptPath
+$zedScript = Get-RepoZedScriptPath
 $dotnetScript = Get-RepoDotnetScriptPath
 $envVarsScript = Get-RepoEnvVarsScriptPath
 $psModulesScript = Get-RepoPowerShellModulesScriptPath
 
-foreach ($p in @($powerShellProfileScript, $fontsScript, $terminalScript, $gitScript, $wingetScript, $visualStudioScript, $ssmsScript, $dotnetScript, $envVarsScript, $psModulesScript)) {
+foreach ($p in @($powerShellProfileScript, $fontsScript, $terminalScript, $gitScript, $wingetScript, $visualStudioScript, $ssmsScript, $zedScript, $dotnetScript, $envVarsScript, $psModulesScript)) {
 	if (-not (Test-Path -LiteralPath $p)) {
 		throw "Missing expected source path: $p"
 	}
@@ -227,6 +243,7 @@ Install-PowerShellModules -SourcePowerShellScriptPath $psModulesScript
 Install-GitConfig -SourceGitScriptPath $gitScript -ProfileName $InstallProfile
 Install-Fonts -SourceFontsScriptPath $fontsScript
 Install-Terminal -SourceTerminalScriptPath $terminalScript
+Install-ZedSettings -SourceZedScriptPath $zedScript
 Install-WingetPackages -SourceWingetScriptPath $wingetScript -ProfileName $InstallProfile
 Install-DotnetTools -SourceDotnetScriptPath $dotnetScript -ProfileName $InstallProfile
 Install-VisualStudio -SourceVisualStudioScriptPath $visualStudioScript

@@ -14,3 +14,4 @@ Microsoft.WindowsTerminal
 GitHub.Copilot
 max-sixty.worktrunk
 can1357.oh-my-pi
+ZedIndustries.Zed

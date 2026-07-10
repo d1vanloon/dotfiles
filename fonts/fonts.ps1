@@ -49,7 +49,14 @@ foreach ($font in $fontFiles) {
 	}
 
 	if ($PSCmdlet.ShouldProcess($font.Name, "Install font to $userFontsDir")) {
-		Copy-Item -LiteralPath $font.FullName -Destination $destPath -Force
+		try {
+			Copy-Item -LiteralPath $font.FullName -Destination $destPath -Force
+		}
+		catch [System.IO.IOException] {
+			Write-Warning "Unable to install font because the destination file is in use: $($font.Name)"
+			continue
+		}
+
 		Set-ItemProperty -Path $regPath -Name $fontRegName -Value $destPath -Force
 		Write-Host "Installed font: $($font.Name)" -ForegroundColor Green
 	}

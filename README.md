@@ -11,6 +11,7 @@ The repository is centered around `install.ps1`, which sets up a local machine b
 - linking a profile-specific Git config from `git/`
 - installing bundled fonts from `fonts/`
 - merging Windows Terminal settings from `terminal/`
+- linking Zed settings from `zed/` into `%APPDATA%\Zed\settings.json`
 - installing WinGet packages from `winget/`
 - installing .NET global tools from `dotnet/`
 - installing Visual Studio Professional Insiders from `visual-studio/`
@@ -41,6 +42,7 @@ The selected profile controls which Git config, WinGet package list, .NET tool l
 - `helpers/` - shared link/copy helpers for installer scripts
 - `fonts/` - bundled fonts and installer
 - `terminal/` - Windows Terminal settings merge script
+- `zed/` - Zed settings file and installer
 - `winget/` - common and profile-specific WinGet package lists
 - `dotnet/` - common and profile-specific .NET global tool lists
 - `visual-studio/` - Visual Studio installation config
