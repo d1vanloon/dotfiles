@@ -170,6 +170,14 @@ function Get-RepoZedScriptPath {
 	return $scriptPath
 }
 
+function Get-RepoAwsScriptPath {
+	$scriptPath = Join-Path $PSScriptRoot 'aws' 'aws.ps1'
+	if (-not (Test-Path -Path $scriptPath -PathType Leaf)) {
+		throw "Expected file not found: $scriptPath"
+	}
+	return $scriptPath
+}
+
 function Install-EnvironmentVars {
 	[CmdletBinding(SupportsShouldProcess = $true)]
 	param(
@@ -220,6 +228,13 @@ function Install-ZedSettings {
 
 	& $SourceZedScriptPath -Force:$Force -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
 }
+
+function Install-AwsConfig {
+	[CmdletBinding(SupportsShouldProcess = $true)]
+	param([Parameter(Mandatory)] [string]$SourceAwsScriptPath)
+
+	& $SourceAwsScriptPath -Force:$Force -WhatIf:$WhatIfPreference -Verbose:($VerbosePreference -ne 'SilentlyContinue')
+}
 $powerShellProfileScript = Get-RepoPowerShellProfileScriptPath
 $fontsScript = Get-RepoFontsScriptPath
 $terminalScript = Get-RepoTerminalScriptPath
@@ -228,11 +243,12 @@ $wingetScript = Get-RepoWingetScriptPath
 $visualStudioScript = Get-RepoVisualStudioScriptPath
 $ssmsScript = Get-RepoSsmsScriptPath
 $zedScript = Get-RepoZedScriptPath
+$awsScript = Get-RepoAwsScriptPath
 $dotnetScript = Get-RepoDotnetScriptPath
 $envVarsScript = Get-RepoEnvVarsScriptPath
 $psModulesScript = Get-RepoPowerShellModulesScriptPath
 
-foreach ($p in @($powerShellProfileScript, $fontsScript, $terminalScript, $gitScript, $wingetScript, $visualStudioScript, $ssmsScript, $zedScript, $dotnetScript, $envVarsScript, $psModulesScript)) {
+foreach ($p in @($powerShellProfileScript, $fontsScript, $terminalScript, $gitScript, $wingetScript, $visualStudioScript, $ssmsScript, $zedScript, $awsScript, $dotnetScript, $envVarsScript, $psModulesScript)) {
 	if (-not (Test-Path -LiteralPath $p)) {
 		throw "Missing expected source path: $p"
 	}
@@ -244,6 +260,7 @@ Install-GitConfig -SourceGitScriptPath $gitScript -ProfileName $InstallProfile
 Install-Fonts -SourceFontsScriptPath $fontsScript
 Install-Terminal -SourceTerminalScriptPath $terminalScript
 Install-ZedSettings -SourceZedScriptPath $zedScript
+Install-AwsConfig -SourceAwsScriptPath $awsScript
 Install-WingetPackages -SourceWingetScriptPath $wingetScript -ProfileName $InstallProfile
 Install-DotnetTools -SourceDotnetScriptPath $dotnetScript -ProfileName $InstallProfile
 Install-VisualStudio -SourceVisualStudioScriptPath $visualStudioScript
@@ -251,3 +268,4 @@ Install-Ssms -SourceSsmsScriptPath $ssmsScript -ProfileName $InstallProfile
 Install-EnvironmentVars -SourceEnvVarsScriptPath $envVarsScript -ProfileName $InstallProfile
 
 Write-Host 'Done.' -ForegroundColor Green
+

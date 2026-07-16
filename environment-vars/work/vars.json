@@ -1,6 +1,7 @@
 {
   "variables": {
-    "OMP_PROFILE": "work"
+    "OMP_PROFILE": "work",
+    "AWS_PROFILE": "pardevbedrock"
   },
   "path": [
     "C:\\Users\\david.vanloon\\.local\\bin"

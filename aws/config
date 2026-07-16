@@ -1,0 +1,15 @@
+[default]
+region = us-east-1
+output = json
+
+[sso-session partech]
+sso_region = us-east-1
+sso_start_url = https://partechnology.awsapps.com/start
+sso_registration_scopes = sso:account:access
+
+[profile pardevbedrock]
+sso_session = partech
+sso_account_id = 916877801273
+sso_role_name = PARDevBedrockSSO
+region = us-east-1
+output = json
