@@ -14,3 +14,4 @@ Anysphere.Cursor
 9WZDNCRDK3WP # Slack
 Anthropic.Claude
 Anthropic.ClaudeCode
+Amazon.AWSCLI
