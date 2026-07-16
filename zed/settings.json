@@ -91,6 +91,13 @@
     "light": "One Light",
     "dark": "One Dark",
   },
+  "lsp": {
+    "powershell-es": {
+      "initialization_options": {
+        "enableProfileLoading": false
+      }
+    }
+  },
   "languages": {
     "CSharp": {
       "language_servers": ["roslyn", "csharp-ls", "omnisharp"]
