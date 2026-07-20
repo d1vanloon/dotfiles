@@ -223,7 +223,7 @@ function New-DraftGitHubPullRequest {
 
     $prTitle = "${issueKey}: $title"
 
-    $reviewers = @("LanceBresslerPar", "francis-jacobs-partech", "vinay-panjabi", "`"@copilot`"")
+    $reviewers = @("LanceBresslerPar", "francis-jacobs-partech", "vinay-panjabi", "johnTusken", "`"@copilot`"")
     $reviewerArgs = $reviewers | ForEach-Object { "--reviewer", $_ }
 
     gh pr create --draft --title "$prTitle" --fill-verbose --base "$baseBranch" --head "$currentBranch" --assignee "@me" @reviewerArgs
