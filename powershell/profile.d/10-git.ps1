@@ -229,6 +229,11 @@ function New-DraftGitHubPullRequest {
     gh pr create --draft --title "$prTitle" --fill-verbose --base "$baseBranch" --head "$currentBranch" --assignee "@me" @reviewerArgs
 }
 
+# Register git-wt shell integration
+if (Get-Command git-wt -ErrorAction SilentlyContinue) {
+    Invoke-Expression (& git-wt config shell init powershell | Out-String)
+}
+
 Set-Alias -Name gitco -Value GitCheckoutFuzzy
 Set-Alias -Name gitpr -Value New-DraftGitHubPullRequest
 Set-Alias -Name jco -Value New-JiraBranch
