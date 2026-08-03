@@ -113,3 +113,14 @@ Set-Alias -Name weather -Value Get-WeatherReport
 function Get-PublicIp {
     Invoke-WebRequest -Uri https://myip.wtf/text | Select-Object -ExpandProperty Content
 }
+
+function Invoke-ClaudeCodeWithMantle {
+    param
+    (
+        [string] $Command
+    )
+
+    Set-Item -Path "env:CLAUDE_CODE_USE_MANTLE" -Value "1"
+    "Claude Code with Mantle enabled" | Write-Host
+    claude $Command
+}

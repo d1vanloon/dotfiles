@@ -28,3 +28,4 @@ Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 Set-Alias -Name youtube-dl -Value yt-dlp
 Set-Alias -Name ytdl -Value yt-dlp
 Set-Alias -Name code -Value code-insiders
+Set-Alias -Name claude-mantle -Value Invoke-ClaudeCodeWithMantle
