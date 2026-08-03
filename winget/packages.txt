@@ -16,3 +16,4 @@ max-sixty.worktrunk
 can1357.oh-my-pi
 ZedIndustries.Zed
 Oven-sh.Bun
+EarendilWorks.pi
