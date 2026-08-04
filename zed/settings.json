@@ -34,7 +34,8 @@
       },
       "default_config_options": {
         "mode": "default",
-        "model": "openrouter/deepseek/deepseek-v4-flash:free"
+        "thinking": "auto",
+        "model": "openrouter/~deepseek/deepseek-v4-flash-latest"
       },
       "type": "custom",
       "command": "omp",
